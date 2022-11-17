@@ -70,7 +70,9 @@ class SingleLinkedList {
         }
 
         BasicIterator& operator++() noexcept {
-            this->node_ = node_->next_node;
+            if (this->node_ != nullptr) {
+                this->node_ = node_->next_node;
+            }
             return *this;
         }
 
@@ -103,24 +105,12 @@ public:
     SingleLinkedList() = default;
 
     SingleLinkedList(std::initializer_list<Type> values) {
-        Node* ptr_at_last = &head_;
-        for (const auto& value : values) {
-            Node* new_node = new Node(value, nullptr);
-            ptr_at_last->next_node = new_node;
-            ptr_at_last = new_node;
-            ++size_;
-        }
+        AssignRange(values.begin(), values.end());
     }
 
     SingleLinkedList(const SingleLinkedList& other) {
         this->Clear();
-        Node* ptr_at_last = &head_;
-        for (auto it = other.begin(); it != other.end(); ++it) {
-            Node* new_node = new Node(*it, nullptr);
-            ptr_at_last->next_node = new_node;
-            ptr_at_last = new_node;
-            ++size_;
-        }
+        AssignRange(other.cbegin(), other.cend());
     }
 
     ~SingleLinkedList() {
@@ -132,7 +122,7 @@ public:
     }
 
     [[nodiscard]] bool IsEmpty() const noexcept {
-        return (size_ == 0) ? true : false;
+        return size_ == 0;
     }
 
     void PushFront(const Type& value) {
@@ -141,13 +131,18 @@ public:
     }
 
     void PopFront() noexcept {
-        Node* to_delete = head_.next_node;
-        head_.next_node = head_.next_node->next_node;
-        delete to_delete;
-        --size_;
+        if (!IsEmpty()) {
+            Node* to_delete = head_.next_node;
+            head_.next_node = head_.next_node->next_node;
+            delete to_delete;
+            --size_;
+        }
     }
 
     Iterator InsertAfter(ConstIterator pos, const Type& value) {
+        if (pos.node_ == nullptr) {
+            return this->end();
+        }
         Node* new_node = new Node(value, pos.node_->next_node);
         pos.node_->next_node = new_node;
         ++size_;
@@ -155,6 +150,9 @@ public:
     }
 
     Iterator EraseAfter(ConstIterator pos) {
+        if (IsEmpty()) {
+            return this->begin();
+        }
         Node* to_delete = pos.node_->next_node;
         pos.node_->next_node = pos.node_->next_node->next_node;
         delete to_delete;
@@ -168,8 +166,8 @@ public:
             head_.next_node = head_.next_node->next_node;
             delete to_delete;
             to_delete = nullptr;
-            --size_;
         }
+        size_ = 0;
     }
 
     [[nodiscard]] Iterator begin() noexcept {
@@ -207,7 +205,7 @@ public:
     [[nodiscard]] ConstIterator before_begin() const noexcept {
         return cbegin();
     }
-    
+
     SingleLinkedList& operator=(const SingleLinkedList& rhs) {
         SingleLinkedList temp_list = SingleLinkedList(rhs);
         this->swap(temp_list);
@@ -227,6 +225,17 @@ public:
 private:
     Node head_;
     size_t size_ = 0;
+
+    template<class InputIter>
+    void AssignRange(InputIter range_begin, InputIter range_end) {
+        Node* ptr_at_last = &head_;
+        for (auto it = range_begin; it != range_end; ++it) {
+            Node* new_node = new Node(*it, nullptr);
+            ptr_at_last->next_node = new_node;
+            ptr_at_last = new_node;
+            ++size_;
+        }
+    }
 };
 
 template <typename Type>
