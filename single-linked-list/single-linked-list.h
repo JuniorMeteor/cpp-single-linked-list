@@ -70,23 +70,25 @@ class SingleLinkedList {
         }
 
         BasicIterator& operator++() noexcept {
-            if (this->node_ != nullptr) {
-                this->node_ = node_->next_node;
-            }
+            assert(this->node_ != nullptr);
+            this->node_ = node_->next_node;
             return *this;
         }
 
         BasicIterator operator++(int) noexcept {
+            assert(this->node_ != nullptr);
             BasicIterator temp(*this);
             this->node_ = node_->next_node;
             return temp;
         }
 
         [[nodiscard]] reference operator*() const noexcept {
+            assert(this->node_ != nullptr);
             return this->node_->value;
         }
 
         [[nodiscard]] pointer operator->() const noexcept {
+            assert(this->node_ != nullptr);
             return &(this->node_->value);
         }
 
