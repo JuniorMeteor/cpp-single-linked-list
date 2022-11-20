@@ -177,7 +177,7 @@ public:
     }
 
     [[nodiscard]] Iterator end() noexcept {
-        return Iterator(nullptr);
+        return {}; // new
     }
 
     [[nodiscard]] ConstIterator begin() const noexcept {
@@ -185,7 +185,7 @@ public:
     }
 
     [[nodiscard]] ConstIterator end() const noexcept {
-        return ConstIterator(nullptr);
+        return cend(); // new
     }
 
     [[nodiscard]] ConstIterator cbegin() const noexcept {
@@ -193,7 +193,7 @@ public:
     }
 
     [[nodiscard]] ConstIterator cend() const noexcept {
-        return ConstIterator(nullptr);
+        return {}; // new
     }
 
     [[nodiscard]] Iterator before_begin() noexcept {
@@ -215,13 +215,8 @@ public:
     }
 
     void swap(SingleLinkedList& other) noexcept {
-        Node temp_node;
-        temp_node.next_node = this->head_.next_node;
-        size_t temp_size = this->size_;
-        this->head_.next_node = other.head_.next_node;
-        this->size_ = other.size_;
-        other.head_.next_node = temp_node.next_node;
-        other.size_ = temp_size;
+        std::swap(head_.next_node, other.nead_next_node); // new
+        std::swap(size_, other.size_); // new
     }
 
 private:
